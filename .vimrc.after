@@ -1,0 +1,74 @@
+syntax enable
+if !has("gui_running")
+    colorscheme solarized
+    set background=dark
+    set shortmess+=I
+    vnoremap <C-c> "*y
+    autocmd VimEnter * NERDTree
+endif
+
+set background=dark
+set nowrap                      " disable text wrapping
+set expandtab                   " use spaces, not tabs
+set autoindent                  " always set autoindenting on
+set copyindent                  " copy the previous indentation on autoindenting
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set smarttab            " Insert appropriate spaces in front of line according to shiftwidth, tabstop, softtabstop.
+set smartindent
+
+colorscheme solarized
+set guifont=Menlo:h22
+
+let g:rspec_command = "Dispatch bundle exec rspec {spec}"
+let g:rspec_runner = "os_x_iterm"
+
+let g:NERDTreeChDirMode=2
+let g:gitgutter_max_signs = 3000
+"Move to the window to mark for the swap via ctrl-w movement
+"Type ,mw
+"Move to the window you want to swap
+"Type ,pw
+
+function! MarkWindowSwap()
+    let g:markedWinNum = winnr()
+endfunction
+
+function! DoWindowSwap()
+    "Mark destination
+    let curNum = winnr()
+    let curBuf = bufnr( "%" )
+    exe g:markedWinNum . "wincmd w"
+    "Switch to source and shuffle dest->source
+    let markedBuf = bufnr( "%" )
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' curBuf
+    "Switch to dest and shuffle source->dest
+    exe curNum . "wincmd w"
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' markedBuf
+endfunction
+
+nmap <silent> <leader>mw :call MarkWindowSwap()<CR>
+nmap <silent> <leader>pw :call DoWindowSwap()<CR>
+nmap <leader>t :call RunCurrentSpecFile()<CR>
+nmap <leader>s :call RunNearestSpec()<CR>
+nmap <leader>l :call RunLastSpec()<CR>
+nmap <leader>a :call RunAllSpecs()<CR>
+
+autocmd BufRead,BufNewFile *.ui set filetype=coffee
+
+" copy current file name (relative/absolute) to system clipboard
+if has("mac") || has("gui_macvim") || has("gui_mac")
+  " relative path  (src/foo.txt)
+  nnoremap <leader>cf :let @+=expand("%") . ':' . line(".")<CR>
+  " absolute path  (/something/src/foo.txt)
+  nnoremap <leader>cF :let @+=expand("%:p") . ':' . line(".")<CR>
+  " filename       (foo.txt)
+  nnoremap <leader>ct :let @+=expand("%:t") . ':' . line(".")<CR>
+  " directory name (/something/src)
+  nnoremap <leader>ch :let @+=expand("%:p:h") . ':' . line(".")<CR>
+endif
+
+nmap ,n :NERDTreeFind<CR>
